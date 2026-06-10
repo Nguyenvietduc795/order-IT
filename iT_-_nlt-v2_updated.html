@@ -6379,6 +6379,7 @@ function nfPickType(id, name){
   document.getElementById('nfSlaText').innerHTML = '<b>IT ph\u1ea3n h\u1ed3i trong ' + sla.recv + '</b><span class="s2">' + sla.est + '</span>';
   // Update step 2 copy
   var h2 = {bug:'Lỗi của bạn đang gặp là gì?', feat:'Thông tin yêu cầu', other:'Thông tin cơ bản'};
+  var s2 = {bug:'Tên ngắn gọn để IT nhận ra ngay, và chọn hệ thống liên quan.', feat:'Đặt tên tính năng và chọn hệ thống sẽ triển khai.', other:'Đặt tên và deadline cho yêu cầu của bạn.'};
   document.getElementById('nfStep2H').textContent = h2[id];
   document.getElementById('nfStep2Sub').textContent = s2[id];
   document.getElementById('nfName').placeholder = {bug:'VD: Điểm danh bấm Lưu không được', feat:'VD: Báo cáo tuần tự gửi vào nhóm leader', other:'VD: Hỗ trợ thiết lập tài khoản mới'}[id];
