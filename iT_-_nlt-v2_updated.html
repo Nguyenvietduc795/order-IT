@@ -1051,13 +1051,12 @@ body::before{
         <div class="np2-footer"><a onclick="toggleNotif2()">Xem tất cả thông báo</a></div>
       </div>
     </div>
-    <!-- Create button + help -->
+    <!-- Create button -->
     <div style="display:flex;align-items:center;gap:6px">
       <button class="btn-create" onclick="openPick()">
         <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         Tạo order
       </button>
-      <button class="btn-help" onclick="openOnboard()" title="Hướng dẫn sử dụng">?</button>
     </div>
   </div>
 </div>
@@ -1186,8 +1185,7 @@ body::before{
         <span class="pj-stage">Kiểm tra &amp; hoàn thiện</span>
         <span class="pj-stage">Ra mắt</span>
       </div>
-      <div class="proj-dri"><div class="proj-dri-ava" style="background:#F59E0B">MT</div><div><div class="proj-dri-name">Minh Trí</div><div class="proj-dri-label">đang phụ trách</div></div></div>
-      <div style="display:flex;align-items:center;gap:7px;margin-top:10px;padding-top:10px;border-top:1px solid #F0EEFF"><div style="width:24px;height:24px;border-radius:50%;background:#F59E0B;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0">MT</div><div><div style="font-size:12px;font-weight:700;color:#374151">Minh Trí</div><div style="font-size:10.5px;color:#9CA3AF">đang phụ trách</div></div></div>
+      <div class="proj-dri"><div class="proj-dri-ava" style="background:#F59E0B" title="Minh Trí — đang phụ trách">MT</div></div>
       <button class="pj-btn" onclick="openStaticProj(0)">🔎 Xem tiến độ chi tiết →</button>
     </div>
 
@@ -1215,8 +1213,7 @@ body::before{
         <span class="pj-stage">Kiểm tra &amp; hoàn thiện</span>
         <span class="pj-stage">Ra mắt</span>
       </div>
-      <div class="proj-dri"><div class="proj-dri-ava" style="background:#EC4899">TH</div><div><div class="proj-dri-name">Thu Hà</div><div class="proj-dri-label">đang phụ trách</div></div></div>
-      <div style="display:flex;align-items:center;gap:7px;margin-top:10px;padding-top:10px;border-top:1px solid #F0EEFF"><div style="width:24px;height:24px;border-radius:50%;background:#EC4899;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0">TH</div><div><div style="font-size:12px;font-weight:700;color:#374151">Thu Hà</div><div style="font-size:10.5px;color:#9CA3AF">đang phụ trách</div></div></div>
+      <div class="proj-dri"><div class="proj-dri-ava" style="background:#EC4899" title="Thu Hà — đang phụ trách">TH</div></div>
       <button class="pj-btn" onclick="openStaticProj(1)">🔎 Xem tiến độ chi tiết →</button>
     </div>
 
@@ -1245,8 +1242,7 @@ body::before{
         <span class="pj-stage">Ra mắt</span>
       </div>
       <div class="pj-checklist-alert" onclick="openStaticProjCL(2)">📋 Checklist nghiệm thu đang chờ — bấm để kiểm tra!</div>
-      <div class="proj-dri"><div class="proj-dri-ava" style="background:#5B4FE8">VĐ</div><div><div class="proj-dri-name">Văn Đức Tân</div><div class="proj-dri-label">đang phụ trách</div></div></div>
-      <div style="display:flex;align-items:center;gap:7px;margin-top:10px;padding-top:10px;border-top:1px solid #F0EEFF"><div style="width:24px;height:24px;border-radius:50%;background:#10B981;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0">KN</div><div><div style="font-size:12px;font-weight:700;color:#374151">Khoa Nguyên</div><div style="font-size:10.5px;color:#9CA3AF">đang phụ trách</div></div></div>
+      <div class="proj-dri"><div class="proj-dri-ava" style="background:#5B4FE8" title="Văn Đức Tân — đang phụ trách">VĐ</div></div>
       <button class="pj-btn" onclick="openStaticProj(2)">🔎 Xem tiến độ chi tiết →</button>
     </div>
 
@@ -5449,7 +5445,6 @@ function openStaticProjCL(idx) {
     <div class="qk-view on" id="qk-intake">
       
       <div class="qk-h">Kể cho IT nghe, <em>như nhắn cho đồng nghiệp</em></div>
-      <p class="qk-sub">Gặp lỗi gì, muốn thêm gì — cứ nói theo cách của bạn. Không cần chọn loại, không cần biết từ kỹ thuật.</p>
 
       <div class="qk-bigbox">
         <textarea id="qkStory" placeholder="Ví dụ: Trang điểm danh ở N-EDU bấm Lưu mà không thấy gì hết, hôm qua còn dùng được. Mình cần gấp vì cuối tuần chốt sổ..." oninput="document.getElementById('qkGo').disabled=!this.value.trim()"></textarea>
@@ -5535,7 +5530,7 @@ function openStaticProjCL(idx) {
       </div>
 
       <div class="qk-done">
-        <h3>Xong khi nào?</h3>
+        <h3>Khi nào sản phẩm hoàn thiện?</h3>
         <p class="hint" id="qkCHint">IT sẽ làm đúng theo các dòng này — và khi nghiệm thu, bạn tick từng dòng. Sửa lại bằng lời của bạn nếu chưa đúng ý.</p>
         <div id="qkCritList"></div>
         <button class="qk-addcrit" onclick="qkAddCrit('')">
@@ -6235,10 +6230,8 @@ function nfPickType(id, name){
   document.querySelectorAll('.nf-type').forEach(function(b){ b.classList.toggle('sel', b.onclick.toString().includes("'"+id+"'")); });
   var sla = NF_SLA[id];
   document.getElementById('nfSlaText').innerHTML = '<b>IT ph\u1ea3n h\u1ed3i trong ' + sla.recv + '</b><span class="s2">' + sla.est + '</span>';
-  document.getElementById('nfSlaBox').classList.add('show');
   // Update step 2 copy
-  var h2 = {bug:'Thông tin lỗi', feat:'Thông tin yêu cầu', other:'Thông tin cơ bản'};
-  var s2 = {bug:'Tên ngắn gọn để IT nhận ra ngay, và chọn hệ thống liên quan.', feat:'Đặt tên tính năng và chọn hệ thống sẽ triển khai.', other:'Đặt tên và deadline cho yêu cầu của bạn.'};
+  var h2 = {bug:'Lỗi của bạn đang gặp là gì?', feat:'Thông tin yêu cầu', other:'Thông tin cơ bản'};
   document.getElementById('nfStep2H').textContent = h2[id];
   document.getElementById('nfStep2Sub').textContent = s2[id];
   document.getElementById('nfName').placeholder = {bug:'VD: Điểm danh bấm Lưu không được', feat:'VD: Báo cáo tuần tự gửi vào nhóm leader', other:'VD: Hỗ trợ thiết lập tài khoản mới'}[id];
@@ -6311,7 +6304,7 @@ function nfValidate3(){
     if(!document.getElementById('nfOtherDesc').value.trim()){ nfT('Vui lòng mô tả yêu cầu của bạn'); return false; }
   }
   var crits=[]; document.querySelectorAll('#nfCritList input').forEach(function(i){ if(i.value.trim()) crits.push(i.value.trim()); });
-  if(!crits.length){ nfT('Cần ít nhất 1 dòng "Xong khi nào?"'); return false; }
+  if(!crits.length){ nfT('Cần ít nhất 1 dòng "Khi nào sản phẩm hoàn thiện?"'); return false; }
   return true;
 }
 function nfNext(n){
