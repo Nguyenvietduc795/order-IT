@@ -6199,7 +6199,7 @@ function cpOpen(orderId){
   briefEl.innerHTML = brief.replace(/\n/g,'<br>');
   if((o.doneCriteria||[]).length){
     briefEl.innerHTML += '<div style="margin-top:12px;padding-top:10px;border-top:1px solid #F3F4F6">'
-      +'<div style="font-size:10px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px">Xong khi nào?</div>'
+      +'<div style="font-size:10px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px">Khi nào sản phẩm hoàn thiện</div>'
       +(o.doneCriteria||[]).map(function(cr,i){ return '<div style="font-size:13px;color:#374151;margin-bottom:5px;display:flex;gap:7px"><span style="flex:none;font-weight:700;color:#5B4FE8">'+(i+1)+'.</span>'+cr+'</div>'; }).join('')
       +'</div>';
   }
