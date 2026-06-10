@@ -3706,7 +3706,6 @@ function projClickGuard(el, state) {
     </div>
 </div>
 
- ═══ -->
 <div id="newProjOverlay" onclick="closeNewProjForm(event)">
   <div class="np-modal">
     <div class="np-hd">
@@ -5369,7 +5368,7 @@ function openStaticProjCL(idx) {
       <div class="qk-sum">
         <div class="qk-quote" id="qkCDesc"></div>
         <div class="qk-row"><span class="k">Loại</span><span class="v">
-          <select id="qkCType"><option>Báo lỗi</option><option>Tính năng mới</option><option>Đăng nhập / quyền</option><option>Khác</option></select></span>
+          <select id="qkCType" onchange="qkApplyDoneSection()"><option>Báo lỗi</option><option>Tính năng mới</option><option>Đăng nhập / quyền</option><option>Khác</option></select></span>
         </div>
         <div class="qk-row"><span class="k">Hệ thống</span><span class="v">
           <select id="qkCSystem"><option>N-EDU</option><option>NQuoc</option><option>team.nquoc.vn</option><option>Bloom</option><option>This is Home</option><option>Chưa rõ — IT xác định giúp</option></select></span>
@@ -5382,12 +5381,29 @@ function openStaticProjCL(idx) {
       </div>
 
       <div class="qk-done">
-        <h3>Khi nào sản phẩm hoàn thiện?</h3>
+        <h3 id="qkDoneTitle">Yêu cầu này xong khi nào?</h3>
         <p class="hint" id="qkCHint">IT sẽ làm đúng theo các dòng này — và khi nghiệm thu, bạn tick từng dòng. Sửa lại bằng lời của bạn nếu chưa đúng ý.</p>
-        <div id="qkCritList"></div>
-        <button class="qk-addcrit" onclick="qkAddCrit('')">
-          <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Thêm một ý nữa
-        </button>
+        <div id="qkCritWrap">
+          <div id="qkCritList"></div>
+          <button class="qk-addcrit" onclick="qkAddCrit('')">
+            <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Thêm một ý nữa
+          </button>
+        </div>
+        <!-- Hoàn thành — chỉ Báo lỗi -->
+        <div class="nf-donebox" id="qkDoneBox" style="display:none;margin-top:12px">
+          <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          <div>Lỗi được khắc phục và <b>bạn xác nhận lại không còn gặp lỗi</b> trên máy của mình — IT sẽ nhắn báo ngay khi sửa xong để bạn kiểm tra.</div>
+        </div>
+        <!-- Hẹn meeting — Tính năng mới -->
+        <div id="qkMeetBox" style="display:none">
+          <div class="nf-2col" id="qkMeetTimeRow">
+            <input type="date" class="nf-input" id="qkMeetDate">
+            <input type="time" class="nf-input" id="qkMeetTime">
+          </div>
+          <label style="display:flex;align-items:center;gap:8px;margin-top:10px;font-size:13px;color:var(--text,#1E1B4B);cursor:pointer">
+            <input type="checkbox" id="qkMeetSkip" onchange="document.getElementById('qkMeetTimeRow').style.display=this.checked?'none':'grid'"> Bỏ qua, không cần meeting — mô tả ở trên là đủ
+          </label>
+        </div>
       </div>
 
       <div class="qk-sla">
@@ -5571,7 +5587,33 @@ function qkBuildConfirm(){
       qkAddCrit('Vấn đề trong lời kể ở trên được xử lý xong');
     }
   }
+  document.getElementById('qkMeetDate').value='';
+  document.getElementById('qkMeetTime').value='';
+  document.getElementById('qkMeetSkip').checked=false;
+  document.getElementById('qkMeetTimeRow').style.display='grid';
+  qkApplyDoneSection();
   qkShow('qk-confirm');
+}
+function qkApplyDoneSection(){
+  var type=document.getElementById('qkCType').value;
+  var title=document.getElementById('qkDoneTitle');
+  var hint=document.getElementById('qkCHint');
+  var critWrap=document.getElementById('qkCritWrap');
+  var doneBox=document.getElementById('qkDoneBox');
+  var meetBox=document.getElementById('qkMeetBox');
+  if(type==='Báo lỗi'){
+    title.textContent='Khi nào xong?';
+    hint.textContent='IT sẽ nhắn báo ngay khi sửa xong để bạn kiểm tra lại — bạn có thể thêm tiêu chí riêng bên dưới.';
+    critWrap.style.display=''; doneBox.style.display='flex'; meetBox.style.display='none';
+  }else if(type==='Tính năng mới'){
+    title.textContent='Hẹn meeting trao đổi';
+    hint.textContent='Tính năng mới thường cần trao đổi thêm trước khi làm — chọn thời gian bạn rảnh, IT sẽ xác nhận lịch họp ngắn.';
+    critWrap.style.display='none'; doneBox.style.display='none'; meetBox.style.display='block';
+  }else{
+    title.textContent='Yêu cầu này xong khi nào?';
+    hint.textContent=qkAI?'IT sẽ làm đúng theo các dòng này — và khi nghiệm thu, bạn tick từng dòng. Sửa lại bằng lời của bạn nếu chưa đúng ý.':'Đây là khung gợi ý sẵn — khi tiếp nhận, IT sẽ cùng bạn chốt lại từng ý trước khi bắt tay làm.';
+    critWrap.style.display=''; doneBox.style.display='none'; meetBox.style.display='none';
+  }
 }
 
 function qkSubmit(){
@@ -5579,8 +5621,22 @@ function qkSubmit(){
   var story = qkState.story;
   var name = story.length > 46 ? story.slice(0,46).trim() + '\u2026' : story;
   var pri = document.getElementById('qkCPriority').value;
+  var ctype = document.getElementById('qkCType').value;
   var criteria = [];
-  document.querySelectorAll('#qkCritList input').forEach(function(i){ if(i.value.trim()) criteria.push(i.value.trim()); });
+  if(ctype==='Báo lỗi'){
+    criteria.push('Lỗi được khắc phục và bạn xác nhận lại không còn gặp lỗi');
+    document.querySelectorAll('#qkCritList input').forEach(function(i){ if(i.value.trim()) criteria.push(i.value.trim()); });
+  }else if(ctype==='Tính năng mới'){
+    var mDate=document.getElementById('qkMeetDate').value, mTime=document.getElementById('qkMeetTime').value;
+    if(document.getElementById('qkMeetSkip').checked || !mDate){
+      criteria.push('Không cần meeting — mô tả ở trên là đủ');
+    }else{
+      var mp=mDate.split('-');
+      criteria.push('Hẹn meeting trao đổi: '+mp[2]+'/'+mp[1]+'/'+mp[0]+(mTime?' lúc '+mTime:''));
+    }
+  }else{
+    document.querySelectorAll('#qkCritList input').forEach(function(i){ if(i.value.trim()) criteria.push(i.value.trim()); });
+  }
   var now = new Date();
   var dd = String(now.getDate()).padStart(2,'0') + '/' + String(now.getMonth()+1).padStart(2,'0') + '/' + now.getFullYear();
   var order = {
@@ -5650,7 +5706,8 @@ function qkSubmit(){
 /* 2-col row */
 .nf-2col{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 /* Urgent toggle */
-.nf-urgrow{display:flex;align-items:center;justify-content:space-between;border:1.5px solid var(--border,#E8E8E0);border-radius:11px;padding:11px 13px;margin-bottom:14px}
+.nf-urgrow{display:none;align-items:center;justify-content:space-between;border:1.5px solid var(--border,#E8E8E0);border-radius:11px;padding:11px 13px;margin-bottom:14px}
+.nf-urgrow.show{display:flex}
 .nf-urgrow .t{font-size:13.5px;font-weight:700;color:var(--text,#1E1B4B)}.nf-urgrow .s{font-size:11.5px;color:#9CA3AF}
 .nf-switch{position:relative;width:42px;height:24px;flex:none}
 .nf-switch input{opacity:0;width:0;height:0}
@@ -5671,6 +5728,36 @@ function qkSubmit(){
 .nf-addcrit{border:none;background:none;cursor:pointer;color:#6B7280;font-size:12.5px;display:flex;align-items:center;gap:6px;font-family:inherit;padding:4px 0;margin-bottom:6px}
 .nf-addcrit:hover{color:var(--purple,#5B4FE8)}
 .nf-addcrit svg{width:13px;height:13px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round}
+.nf-donebox{display:flex;gap:10px;align-items:flex-start;background:#F0FDF4;border:1.5px solid #BBF7D0;border-radius:11px;padding:12px 13px;font-size:12.5px;line-height:1.55;color:#166534}
+.nf-donebox svg{flex:none;width:18px;height:18px;stroke:#22C55E;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;margin-top:1px}
+/* Paste screenshot zone */
+.nf-pastezone{margin-top:8px;display:flex;align-items:center;gap:8px;justify-content:center;border:1.5px dashed var(--border,#E8E8E0);border-radius:11px;padding:12px;font-size:12px;color:#9CA3AF;cursor:text;text-align:center;transition:border-color .15s,background .15s}
+.nf-pastezone svg{flex:none;width:16px;height:16px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.nf-pastezone:focus{outline:none;border-color:var(--purple,#5B4FE8);color:#5B4FE8;background:#F8F7FF}
+.nf-pastezone.flash{border-color:#22C55E;color:#22C55E;background:#F0FDF4}
+/* Image thumbs */
+.nf-img-thumb{position:relative;display:inline-block;flex-shrink:0}
+.nf-img-thumb img{width:80px;height:80px;object-fit:cover;border-radius:10px;border:1.5px solid #DDD6FE;display:block}
+.nf-img-thumb .edit,.nf-img-thumb .del{position:absolute;top:-6px;width:20px;height:20px;border-radius:50%;border:none;cursor:pointer;color:#fff;font-size:11px;line-height:1;display:flex;align-items:center;justify-content:center;font-weight:700;padding:0}
+.nf-img-thumb .edit{right:18px;background:#5B4FE8}
+.nf-img-thumb .edit svg{width:11px;height:11px;stroke:#fff;stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.nf-img-thumb .del{right:-6px;background:#EF4444}
+.nf-img-thumb .name{font-size:10px;color:#9CA3AF;margin-top:3px;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* Image editor modal */
+.nf-imgedit-overlay{display:none;position:fixed;inset:0;background:rgba(30,27,75,.55);z-index:10000;align-items:center;justify-content:center;padding:20px}
+.nf-imgedit-overlay.open{display:flex}
+.nf-imgedit-box{background:#fff;border-radius:16px;padding:18px;max-width:94vw;max-height:92vh;overflow:auto;display:flex;flex-direction:column;gap:12px}
+.nf-imgedit-h{font-size:15px;font-weight:800;color:var(--text,#1E1B4B)}
+.nf-imgedit-tools{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.nf-imgedit-tool{border:1.5px solid var(--border,#E8E8E0);background:#fff;border-radius:9px;padding:7px 12px;font-size:12.5px;font-weight:700;color:#6B7280;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:inherit}
+.nf-imgedit-tool svg{width:14px;height:14px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.nf-imgedit-tool.sel{border-color:var(--purple,#5B4FE8);color:var(--purple,#5B4FE8);background:#F8F7FF}
+.nf-imgedit-colors{display:flex;align-items:center;gap:6px}
+.nf-imgedit-color{width:22px;height:22px;border-radius:50%;border:2px solid transparent;cursor:pointer;padding:0}
+.nf-imgedit-color.sel{border-color:var(--text,#1E1B4B)}
+.nf-imgedit-canvas-wrap{border:1.5px solid var(--border,#E8E8E0);border-radius:11px;overflow:auto;max-width:100%;line-height:0}
+.nf-imgedit-canvas-wrap canvas{max-width:100%;cursor:crosshair;touch-action:none}
+.nf-imgedit-actions{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap}
 /* Actions */
 .nf-actions{display:flex;gap:10px;margin-top:18px}
 .nf-btn-ghost{flex:none;padding:12px 18px;border:1.5px solid var(--border,#E8E8E0);border-radius:12px;background:#fff;color:#6B7280;font-weight:700;font-size:13.5px;cursor:pointer;font-family:inherit;transition:all .15s}
@@ -5841,31 +5928,29 @@ function qkSubmit(){
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
         <div id="nfSlaText"></div>
       </div>
-      <div class="nf-actions"><button class="nf-btn-main" onclick="nfNext(2)">Tiếp theo</button></div>
     </div>
 
     <!-- BƯỚC 2: THÔNG TIN CƠ BẢN -->
         <div class="nf-view" id="nf-2">
       <div class="nf-h" id="nfStep2H">Thông tin yêu cầu</div>
-      <p class="nf-sub" id="nfStep2Sub">Đặt tên theo cách bạn hay gọi khi kể cho đồng nghiệp nghe.</p>
       <div class="nf-field">
-        <div class="nf-label"><span>Tên yêu cầu <span class="req">*</span></span><span class="cnt" id="nfNameCnt">0/120</span></div>
+        <div class="nf-label"><span><span id="nfNameLabel">Tên yêu cầu</span> <span class="req">*</span></span><span class="cnt" id="nfNameCnt">0/120</span></div>
         <input class="nf-input" id="nfName" maxlength="120" placeholder="" oninput="document.getElementById('nfNameCnt').textContent=this.value.length+'/120'">
       </div>
       <div class="nf-field">
-        <div class="nf-label"><span>Hệ thống liên quan</span></div>
-        <select class="nf-select" id="nfSystem">
-          <option value="">Chưa rõ — IT xác định giúp</option>
+        <div class="nf-label"><span id="nfSystemLabel">Hệ thống liên quan</span></div>
+        <input class="nf-input" id="nfSystem" list="nfSystemList" placeholder="Dán link trang web, hoặc chọn hệ thống bên dưới...">
+        <datalist id="nfSystemList">
           <option>N-EDU</option><option>NQuoc (nquoc.vn)</option><option>team.nquoc.vn</option>
           <option>Bloom</option><option>This is Home</option><option>Family Cloud</option>
-        </select>
+        </datalist>
       </div>
       <div class="nf-field">
-        <div class="nf-label"><span>Cần xong trước <span class="req">*</span></span></div>
+        <div class="nf-label"><span>Deadline <span class="req">*</span></span></div>
         <input class="nf-input" id="nfDeadline" type="date" onchange="nfCheckDeadline()">
         <input type="hidden" id="nfImpact" value="minor">
       </div>
-      <div class="nf-urgrow">
+      <div class="nf-urgrow" id="nf-urgrow-wrap">
         <div><div class="t">Yêu cầu gấp</div><div class="s">Chỉ bật khi thật sự ảnh hưởng nghiêm trọng</div></div>
         <label class="nf-switch"><input type="checkbox" id="nfUrgent" onchange="nfCheckDeadline()"><span class="tr"></span></label>
       </div>
@@ -5879,27 +5964,9 @@ function qkSubmit(){
     <!-- BƯỚC 3: CHI TIẾT — thay đổi theo loại -->
     <div class="nf-view" id="nf-3">
       <div class="nf-h" id="nfStep3H">Chi tiết</div>
-      <p class="nf-sub" id="nfStep3Sub">IT cần đủ thông tin để xử lý đúng ngay lần đầu.</p>
 
       <!-- === BÁO LỖI === -->
       <div id="nfFieldsBug">
-        <div class="nf-field">
-          <div class="nf-label"><span>Bạn đang làm gì thì gặp lỗi? <span class="req">*</span></span></div>
-          <input class="nf-input" id="nfBugAction" placeholder="VD: Tôi đang bấm nút Lưu trong form điểm danh thì...">
-        </div>
-        <div class="nf-field">
-          <div class="nf-label"><span>Vấn đề là gì và bạn cần điều gì? <span class="req">*</span></span></div>
-          <textarea class="nf-ta" id="nfBugExpect" placeholder="VD: Mình bấm Lưu thì muốn dữ liệu được ghi lại — nhưng hiện tại trang trắng và không có gì xảy ra." style="min-height:90px"></textarea>
-          <input type="hidden" id="nfBugActual" value="">
-        </div>>
-        <div class="nf-field">
-          <div class="nf-label"><span>Tần suất xảy ra</span></div>
-          <select class="nf-select" id="nfBugFreq">
-            <option value="always">Luôn luôn — 100% lần thử</option>
-            <option value="often">Thường xuyên</option>
-            <option value="once">Chỉ xảy ra 1 lần</option>
-          </select>
-        </div>
         <div class="nf-field">
           <div class="nf-label"><span>Link trang / Ảnh chụp màn hình</span></div>
           <div style="display:flex;gap:8px;align-items:center">
@@ -5910,15 +5977,53 @@ function qkSubmit(){
             </label>
             <input type="file" id="nfBugImg" accept="image/*" multiple style="display:none" onchange="nfHandleImg(this)">
           </div>
+          <div class="nf-pastezone" id="nfPasteZone" tabindex="0">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="4" rx="1"/><path d="M9 4H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-4"/></svg>
+            Bấm vào đây rồi dán ảnh chụp màn hình bằng Ctrl+V
+          </div>
           <div id="nfBugImgPreview" style="margin-top:8px;display:flex;flex-wrap:wrap;gap:8px"></div>
-          <div class="nf-hint">Ảnh chụp màn hình giúp IT tái hiện lỗi nhanh hơn 2–3x — tải nhiều ảnh cùng lúc</div>
+          <div class="nf-hint">Ảnh chụp màn hình giúp IT tái hiện lỗi nhanh hơn 2–3x — tải nhiều ảnh cùng lúc, có thể chỉnh sửa/khoanh vùng sau khi thêm</div>
+        </div>
+        <div class="nf-field">
+          <div class="nf-label"><span>Bạn đang làm gì thì gặp lỗi? <span class="req">*</span></span></div>
+          <input class="nf-input" id="nfBugAction" placeholder="VD: Tôi đang bấm nút Lưu trong form điểm danh thì...">
+        </div>
+        <div class="nf-field">
+          <div class="nf-label"><span>Vấn đề là gì và bạn cần điều gì? <span class="req">*</span></span></div>
+          <textarea class="nf-ta" id="nfBugExpect" placeholder="VD: Mình bấm Lưu thì muốn dữ liệu được ghi lại — nhưng hiện tại trang trắng và không có gì xảy ra." style="min-height:90px"></textarea>
+          <input type="hidden" id="nfBugActual" value="">
+        </div>
+        <div class="nf-field">
+          <div class="nf-label"><span>Tần suất xảy ra</span></div>
+          <select class="nf-select" id="nfBugFreq">
+            <option value="always">Luôn luôn — 100% lần thử</option>
+            <option value="often">Thường xuyên</option>
+            <option value="once">Chỉ xảy ra 1 lần</option>
+          </select>
         </div>
       </div>
 
       <!-- === TÍNH NĂNG MỚI === -->
       <div id="nfFieldsFeat" style="display:none">
         <div class="nf-field">
-          <div class="nf-label"><span>Vấn đề bạn đang gặp là gì? <span class="req">*</span></span><span class="cnt" id="nfFeatProbCnt">0/600</span></div>
+          <div class="nf-label"><span>Link tham khảo / mockup</span></div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input class="nf-input" id="nfFeatRef" placeholder="Link app tham khảo, Drive mockup, screenshot..." style="flex:1">
+            <label for="nfFeatImg" style="flex:none;display:flex;align-items:center;gap:6px;padding:10px 14px;border:1.5px solid var(--border,#E8E8E0);border-radius:11px;cursor:pointer;font-size:12.5px;font-weight:700;color:#5B4FE8;background:#F8F7FF;white-space:nowrap;transition:background .15s" onmouseover="this.style.background='#EDE9FE'" onmouseout="this.style.background='#F8F7FF'">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              Thêm ảnh
+            </label>
+            <input type="file" id="nfFeatImg" accept="image/*" multiple style="display:none" onchange="nfHandleImg(this,'feat')">
+          </div>
+          <div class="nf-pastezone" id="nfFeatPasteZone" tabindex="0">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="4" rx="1"/><path d="M9 4H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-4"/></svg>
+            Bấm vào đây rồi dán ảnh chụp màn hình bằng Ctrl+V
+          </div>
+          <div id="nfFeatImgPreview" style="margin-top:8px;display:flex;flex-wrap:wrap;gap:8px"></div>
+          <div class="nf-hint">Ảnh/mockup giúp IT hiểu rõ ý tưởng hơn — tải nhiều ảnh cùng lúc, có thể chỉnh sửa/khoanh vùng sau khi thêm</div>
+        </div>
+        <div class="nf-field">
+          <div class="nf-label"><span>Bạn muốn thêm là gì? <span class="req">*</span></span><span class="cnt" id="nfFeatProbCnt">0/600</span></div>
           <textarea class="nf-ta" id="nfFeatProb" maxlength="600" placeholder="Không load được trang, nút không hoạt động,..." oninput="document.getElementById('nfFeatProbCnt').textContent=this.value.length+'/600'"></textarea>
         </div>
         <div class="nf-field">
@@ -5932,10 +6037,6 @@ function qkSubmit(){
             <option>Cả phòng ban</option>
             <option>Toàn bộ hệ thống / khách hàng ngoài</option>
           </select>
-        </div>
-        <div class="nf-field">
-          <div class="nf-label"><span>Link tham khảo / mockup</span></div>
-          <input class="nf-input" id="nfFeatRef" placeholder="Link app tham khảo, Drive mockup, screenshot...">
         </div>
       </div>
 
@@ -5951,14 +6052,32 @@ function qkSubmit(){
         </div>
       </div>
 
-      <!-- Done criteria — chung cho tất cả -->
-      <div class="nf-field" style="margin-top:4px">
-        <div class="nf-label"><span>Khi nào sản phẩm hoàn thành? <span class="req">*</span></span></div>
-        <div class="nf-hint" style="margin-bottom:10px">IT sẽ làm đúng theo các dòng này. Khi nghiệm thu bạn tick từng dòng — IT done khi bạn tick đủ.</div>
+      <!-- Done criteria — "Khác" & "Báo lỗi" -->
+      <div class="nf-field" id="nfCritSection" style="margin-top:4px">
+        <div class="nf-label"><span><span id="nfCritTitle">Yêu cầu này xong khi nào?</span> <span class="req">*</span></span></div>
+        <div class="nf-hint" style="margin-bottom:10px">Mình tóm lại những gì bạn cần</div>
         <div id="nfCritList"></div>
         <button class="nf-addcrit" onclick="nfAddCrit('')">
           <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Thêm một ý nữa
         </button>
+        <!-- Hoàn thành — chỉ Báo lỗi -->
+        <div class="nf-donebox" id="nfDoneSection" style="display:none;margin-top:12px">
+          <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          <div>Lỗi được khắc phục và <b>bạn xác nhận lại không còn gặp lỗi</b> trên máy của mình — IT sẽ nhắn báo ngay khi sửa xong để bạn kiểm tra.</div>
+        </div>
+      </div>
+
+      <!-- Hẹn meeting — Tính năng mới -->
+      <div class="nf-field" id="nfMeetSection" style="margin-top:4px;display:none">
+        <div class="nf-label"><span>Hẹn meeting trao đổi <span class="cnt">(không bắt buộc)</span></span></div>
+        <div class="nf-hint" style="margin-bottom:10px">Tính năng mới thường cần trao đổi thêm trước khi làm — chọn thời gian bạn rảnh, IT sẽ xác nhận lịch họp ngắn.</div>
+        <div class="nf-2col" id="nfMeetTimeRow">
+          <input type="date" class="nf-input" id="nfMeetDate">
+          <input type="time" class="nf-input" id="nfMeetTime">
+        </div>
+        <label style="display:flex;align-items:center;gap:8px;margin-top:10px;font-size:13px;color:var(--text,#1E1B4B);cursor:pointer">
+          <input type="checkbox" id="nfMeetSkip" onchange="document.getElementById('nfMeetTimeRow').style.display=this.checked?'none':'grid'"> Bỏ qua, không cần meeting — mô tả ở trên là đủ
+        </label>
       </div>
 
       <div class="nf-actions">
@@ -5979,14 +6098,6 @@ function qkSubmit(){
         <div class="nf-srow"><span class="k">Tóm tắt</span><span class="v" id="nfSBrief" style="white-space:pre-wrap"></span></div>
         <div class="nf-srow" id="nfSCritRow"><span class="k">Done khi</span><span class="v" id="nfSCrit"></span></div>
       </div>
-      <div class="nf-slabox show" style="margin-bottom:12px">
-        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-        <div id="nfSSla"></div>
-      </div>
-      <div class="nf-dri-note">
-        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        <div>Sau khi IT duyệt, bạn sẽ thấy <b>tên và avatar người phụ trách</b> ngay trên thẻ — và nhắn tin trực tiếp trong phần chi tiết order.</div>
-      </div>
       <div class="nf-actions">
         <button class="nf-btn-ghost" onclick="nfShow(3)">Quay lại</button>
         <button class="nf-btn-main" onclick="nfSubmit()">Gửi cho IT</button>
@@ -6003,7 +6114,7 @@ function qkSubmit(){
         <div style="display:inline-block;font-size:12px;letter-spacing:.1em;color:#6B7280;background:#F3F4F6;border-radius:99px;padding:6px 14px;margin:10px 0 22px;font-weight:700" id="nfOkId">ORDER</div>
         <div class="nf-slabox show" style="margin-bottom:10px">
           <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-          <div><b id="nfOkSla"></b><div class="s2">Quá hạn mà chưa có phản hồi, order tự động báo lên leader IT.</div></div>
+          <div><b id="nfOkSla"></b></div>
         </div>
         <button class="qk-tg" style="width:100%;background:#5B4FE8;border-color:#5B4FE8" onclick="nfOpenChat()">
           <svg viewBox="0 0 24 24" style="width:17px;height:17px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
@@ -6012,6 +6123,38 @@ function qkSubmit(){
         <p style="font-size:12px;color:var(--text-muted,#6B7280);margin:4px 0 0;text-align:center">Trao đổi trực tiếp với IT trong ô chat của order.</p>
         <button class="qk-ghost" onclick="nfClose()" style="width:100%;margin-top:4px">Xem trong Dự án của tôi</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Image annotation editor -->
+<div class="nf-imgedit-overlay" id="nfImgEditOverlay" onclick="if(event.target===this)nfImgEditClose()">
+  <div class="nf-imgedit-box">
+    <div class="nf-imgedit-h">Chỉnh sửa ảnh chụp màn hình</div>
+    <div class="nf-imgedit-tools">
+      <button class="nf-imgedit-tool sel" id="nfIeToolPen" onclick="nfImgEditTool('pen')">
+        <svg viewBox="0 0 24 24"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>Bút vẽ
+      </button>
+      <button class="nf-imgedit-tool" id="nfIeToolRect" onclick="nfImgEditTool('rect')">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>Khung chữ nhật
+      </button>
+      <button class="nf-imgedit-tool" id="nfIeToolArrow" onclick="nfImgEditTool('arrow')">
+        <svg viewBox="0 0 24 24"><path d="M5 19L19 5"/><path d="M9 5h10v10"/></svg>Mũi tên
+      </button>
+      <div class="nf-imgedit-colors" id="nfIeColors"></div>
+      <button class="nf-imgedit-tool" onclick="nfImgEditUndo()">
+        <svg viewBox="0 0 24 24"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-15-6.7L3 13"/></svg>Hoàn tác
+      </button>
+      <button class="nf-imgedit-tool" onclick="nfImgEditReset()">
+        <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9"/><path d="M3 4v8h8"/></svg>Đặt lại
+      </button>
+    </div>
+    <div class="nf-imgedit-canvas-wrap">
+      <canvas id="nfIeCanvas"></canvas>
+    </div>
+    <div class="nf-imgedit-actions">
+      <button class="nf-btn-ghost" onclick="nfImgEditClose()">Huỷ</button>
+      <button class="nf-btn-main" onclick="nfImgEditSave()">Lưu chỉnh sửa</button>
     </div>
   </div>
 </div>
@@ -6084,13 +6227,13 @@ function nfPickType(id, name){
   // Update step 2 copy
   var h2 = {bug:'Lỗi của bạn đang gặp là gì?', feat:'Thông tin yêu cầu', other:'Thông tin cơ bản'};
   document.getElementById('nfStep2H').textContent = h2[id];
-  document.getElementById('nfStep2Sub').textContent = s2[id];
+  document.getElementById('nfNameLabel').textContent = (id==='bug') ? 'Tên lỗi' : 'Tên yêu cầu';
+  document.getElementById('nfSystemLabel').textContent = {bug:'Trang web đang gặp lỗi', feat:'Trang web cần thêm tính năng', other:'Hệ thống liên quan'}[id];
   document.getElementById('nfName').placeholder = {bug:'VD: Điểm danh bấm Lưu không được', feat:'VD: Báo cáo tuần tự gửi vào nhóm leader', other:'VD: Hỗ trợ thiết lập tài khoản mới'}[id];
   // Step 3 labels
   var h3 = {bug:'Chi tiết lỗi', feat:'Chi tiết tính năng', other:'Mô tả yêu cầu'};
-  var s3 = {bug:'Càng cụ thể, IT fix càng nhanh — ít vòng hỏi lại.', feat:'Editor không đọc được suy nghĩ. Mô tả rõ vấn đề và kết quả cần đạt.', other:'Kể theo cách của bạn — IT sẽ hỏi lại nếu cần.'};
   document.getElementById('nfStep3H').textContent = h3[id];
-  document.getElementById('nfStep3Sub').textContent = s3[id];
+  nfNext(2);
 }
 function nfDaysFromToday(iso){
   if(!iso) return null;
@@ -6101,7 +6244,10 @@ function nfDaysFromToday(iso){
 function nfCheckDeadline(){
   var dl=document.getElementById('nfDeadline').value, urg=document.getElementById('nfUrgent').checked;
   var min=(NF_SLA[nfData.type]||{minDays:1}).minDays, days=nfDaysFromToday(dl);
-  var tight=days!==null&&days<min&&!urg;
+  var close=days!==null&&days<=min;
+  var tight=close&&!urg;
+  document.getElementById('nf-urgrow-wrap').classList.toggle('show',close);
+  if(!close) document.getElementById('nfUrgent').checked=false;
   document.getElementById('nfWarn').classList.toggle('show',tight);
   return !tight;
 }
@@ -6154,8 +6300,10 @@ function nfValidate3(){
   if(nfData.type==='other'){
     if(!document.getElementById('nfOtherDesc').value.trim()){ nfT('Vui lòng mô tả yêu cầu của bạn'); return false; }
   }
-  var crits=[]; document.querySelectorAll('#nfCritList input').forEach(function(i){ if(i.value.trim()) crits.push(i.value.trim()); });
-  if(!crits.length){ nfT('Cần ít nhất 1 dòng "Khi nào sản phẩm hoàn thiện?"'); return false; }
+  if(nfData.type==='other'||nfData.type==='bug'){
+    var crits=[]; document.querySelectorAll('#nfCritList input').forEach(function(i){ if(i.value.trim()) crits.push(i.value.trim()); });
+    if(!crits.length){ nfT('Cần ít nhất 1 dòng "'+(nfData.type==='bug'?'Khi nào xong?':'Yêu cầu này xong khi nào?')+'"'); return false; }
+  }
   return true;
 }
 function nfNext(n){
@@ -6173,13 +6321,31 @@ function nfNext(n){
     nfData.impact=document.getElementById('nfImpact').value;
     // show/hide type-specific fields
     ['Bug','Feat','Other'].forEach(function(t){ document.getElementById('nfFields'+t).style.display=(t.toLowerCase()===nfData.type||('feat'===nfData.type&&t==='Feat')||('other'===nfData.type&&t==='Other')||('bug'===nfData.type&&t==='Bug'))?'':'none'; });
+    // Xong khi nào? — type-dependent sections
+    document.getElementById('nfCritSection').style.display=(nfData.type==='other'||nfData.type==='bug')?'':'none';
+    document.getElementById('nfDoneSection').style.display=(nfData.type==='bug')?'flex':'none';
+    document.getElementById('nfMeetSection').style.display=(nfData.type==='feat')?'':'none';
+    document.getElementById('nfCritTitle').textContent=(nfData.type==='bug')?'Khi nào xong?':'Yêu cầu này xong khi nào?';
     // seed criteria if empty
-    if(!document.querySelector('#nfCritList input')) nfSeedCrit();
+    if((nfData.type==='other'||nfData.type==='bug')&&!document.querySelector('#nfCritList input')) nfSeedCrit();
   }
   if(n===4){
     if(!nfValidate3()) return;
     nfData.brief=nfGetBrief(); nfData.ref=nfGetRef();
-    nfData.criteria=[]; document.querySelectorAll('#nfCritList input').forEach(function(i){ if(i.value.trim()) nfData.criteria.push(i.value.trim()); });
+    if(nfData.type==='bug'){
+      nfData.criteria=['Lỗi được khắc phục và bạn xác nhận lại không còn gặp lỗi'];
+      document.querySelectorAll('#nfCritList input').forEach(function(i){ if(i.value.trim()) nfData.criteria.push(i.value.trim()); });
+    }else if(nfData.type==='feat'){
+      var mDate=document.getElementById('nfMeetDate').value, mTime=document.getElementById('nfMeetTime').value;
+      if(document.getElementById('nfMeetSkip').checked || !mDate){
+        nfData.criteria=['Không cần meeting — mô tả ở trên là đủ'];
+      }else{
+        var mp=mDate.split('-');
+        nfData.criteria=['Hẹn meeting trao đổi: '+mp[2]+'/'+mp[1]+'/'+mp[0]+(mTime?' lúc '+mTime:'')];
+      }
+    }else{
+      nfData.criteria=[]; document.querySelectorAll('#nfCritList input').forEach(function(i){ if(i.value.trim()) nfData.criteria.push(i.value.trim()); });
+    }
     var p=nfData.deadline.split('-');
     document.getElementById('nfSName').textContent=nfData.name;
     document.getElementById('nfSType').textContent=NF_ICONS[nfData.type]+' '+nfData.typeName+(nfData.urgent?' · ⚡ GẤP':'');
@@ -6187,8 +6353,6 @@ function nfNext(n){
     document.getElementById('nfSDeadline').textContent=p[2]+'/'+p[1]+'/'+p[0];
     document.getElementById('nfSBrief').textContent=nfData.brief.slice(0,280)+(nfData.brief.length>280?'…':'');
     document.getElementById('nfSCrit').textContent=nfData.criteria.join(' · ');
-    var sla=NF_SLA[nfData.type];
-    document.getElementById('nfSSla').innerHTML='<b>IT ph\u1ea3n h\u1ed3i trong '+sla.recv+'</b><span class="s2">'+sla.est+'</span>';
   }
   nfShow(n);
 }
@@ -6215,13 +6379,21 @@ function nfOpen(){
   ['nfName','nfBugAction','nfBugExpect','nfBugActual','nfBugRef','nfFeatProb','nfFeatDesc','nfFeatRef','nfOtherDesc','nfOtherRef','nfDeadline'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
   ['nfNameCnt','nfFeatProbCnt','nfFeatDescCnt','nfOtherCnt'].forEach(function(id){ var el=document.getElementById(id); if(el) el.textContent=el.textContent.replace(/^\d+/,'0'); });
   document.getElementById('nfUrgent').checked=false;
+  document.getElementById('nf-urgrow-wrap').classList.remove('show');
   document.getElementById('nfWarn').classList.remove('show');
   document.getElementById('nfSlaBox').classList.remove('show');
   document.querySelectorAll('.nf-type').forEach(function(b){ b.classList.remove('sel'); });
   document.getElementById('nfCritList').innerHTML='';
-  var _prev=document.getElementById('nfBugImgPreview'); if(_prev){_prev.innerHTML='';}
-  var _fi=document.getElementById('nfBugImg'); if(_fi) _fi.value='';
-  _nfImgFiles=[];
+  document.getElementById('nfCritSection').style.display='none';
+  document.getElementById('nfDoneSection').style.display='none';
+  document.getElementById('nfMeetSection').style.display='none';
+  document.getElementById('nfMeetDate').value='';
+  document.getElementById('nfMeetTime').value='';
+  document.getElementById('nfMeetSkip').checked=false;
+  document.getElementById('nfMeetTimeRow').style.display='grid';
+  ['nfBugImgPreview','nfFeatImgPreview'].forEach(function(id){ var p=document.getElementById(id); if(p) p.innerHTML=''; });
+  ['nfBugImg','nfFeatImg'].forEach(function(id){ var f=document.getElementById(id); if(f) f.value=''; });
+  _nfImgFiles={bug:[], feat:[]};
   ['Bug','Feat','Other'].forEach(function(t){ document.getElementById('nfFields'+t).style.display='none'; });
   nfShow(1); document.getElementById('nfOverlay').classList.add('open'); document.body.style.overflow='hidden';
 }
@@ -6297,42 +6469,219 @@ function cpDeliver(){
 
 </script>
 <script>
-var _nfImgFiles = [];
-function nfHandleImg(inp){
-  if(!inp.files||!inp.files.length) return;
-  var preview=document.getElementById('nfBugImgPreview');
-  Array.from(inp.files).forEach(function(file, idx){
-    if(!file.type.startsWith('image/')) return;
-    var uid = 'nfimg_'+ Date.now() + '_' + idx;
-    _nfImgFiles.push({uid:uid,file:file});
-    var reader=new FileReader();
-    reader.onload=function(e){
-      var div=document.createElement('div');
-      div.id=uid;
-      div.style.cssText='position:relative;display:inline-block;flex-shrink:0';
-      div.innerHTML='<img src="'+e.target.result+'" style="width:80px;height:80px;object-fit:cover;border-radius:10px;border:1.5px solid #DDD6FE;display:block">'
-        +'<button onclick="nfRemoveImg(\''+uid+'\')" style="position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;background:#EF4444;border:none;cursor:pointer;color:#fff;font-size:12px;line-height:1;display:flex;align-items:center;justify-content:center;font-weight:700;padding:0">×</button>'
-        +'<div style="font-size:10px;color:#9CA3AF;margin-top:3px;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+file.name.slice(0,18)+'</div>';
-      preview.appendChild(div);
-    };
-    reader.readAsDataURL(file);
-  });
-  // update ref field
-  var ref=document.getElementById('nfBugRef');
-  if(!ref.value || ref.value.startsWith('[ảnh'))
-    ref.value='['+_nfImgFiles.length+' ảnh đính kèm]';
-  inp.value='';
+var _nfImgFiles = {bug:[], feat:[]};
+var NF_IMG_CFG = {
+  bug:{preview:'nfBugImgPreview', ref:'nfBugRef'},
+  feat:{preview:'nfFeatImgPreview', ref:'nfFeatRef'}
+};
+function nfAddImageFile(file, name, field){
+  field = field||'bug';
+  if(!file.type.startsWith('image/')) return;
+  var uid = 'nfimg_'+field+'_'+Date.now()+'_'+Math.floor(Math.random()*10000);
+  var reader=new FileReader();
+  reader.onload=function(e){
+    _nfImgFiles[field].push({uid:uid, name:name||file.name||'screenshot.png', dataURL:e.target.result, field:field});
+    nfRenderImgThumb(uid, e.target.result, name||file.name||'screenshot.png', field);
+    nfUpdateImgRef(field);
+  };
+  reader.readAsDataURL(file);
 }
-function nfRemoveImg(uid){
-  _nfImgFiles = _nfImgFiles.filter(function(f){return f.uid!==uid;});
+function nfRenderImgThumb(uid, dataURL, name, field){
+  var preview=document.getElementById(NF_IMG_CFG[field].preview);
+  var div=document.createElement('div');
+  div.id=uid;
+  div.className='nf-img-thumb';
+  div.innerHTML='<img src="'+dataURL+'">'
+    +'<button class="edit" onclick="nfImgEditOpen(\''+uid+'\')" title="Chỉnh sửa"><svg viewBox="0 0 24 24"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/></svg></button>'
+    +'<button class="del" onclick="nfRemoveImg(\''+uid+'\',\''+field+'\')" title="Xoá">×</button>'
+    +'<div class="name">'+(name||'').slice(0,18)+'</div>';
+  preview.appendChild(div);
+}
+function nfUpdateImgRef(field){
+  var ref=document.getElementById(NF_IMG_CFG[field].ref);
+  var files=_nfImgFiles[field];
+  if(files.length===0){
+    if(ref.value.startsWith('[')) ref.value='';
+  } else if(!ref.value || ref.value.startsWith('[')){
+    ref.value='['+files.length+' ảnh đính kèm]';
+  }
+}
+function nfRemoveImg(uid, field){
+  _nfImgFiles[field] = _nfImgFiles[field].filter(function(f){return f.uid!==uid;});
   var el=document.getElementById(uid);
   if(el) el.remove();
-  var ref=document.getElementById('nfBugRef');
-  if(_nfImgFiles.length===0){
-    if(ref.value.startsWith('[')) ref.value='';
-  } else {
-    ref.value='['+_nfImgFiles.length+' ảnh đính kèm]';
+  nfUpdateImgRef(field);
+}
+function nfHandleImg(inp, field){
+  if(!inp.files||!inp.files.length) return;
+  Array.from(inp.files).forEach(function(file){ nfAddImageFile(file, null, field); });
+  inp.value='';
+}
+// Paste screenshot (Ctrl+V)
+function nfWirePasteZone(zoneId, field){
+  var zone=document.getElementById(zoneId);
+  if(!zone) return;
+  zone.addEventListener('click',function(){ zone.focus(); });
+  zone.addEventListener('paste',function(e){
+    var items=(e.clipboardData||window.clipboardData).items;
+    var found=false;
+    for(var i=0;i<items.length;i++){
+      if(items[i].type.indexOf('image')!==-1){
+        var file=items[i].getAsFile();
+        nfAddImageFile(file, 'screenshot-'+Date.now()+'.png', field);
+        found=true;
+      }
+    }
+    if(found){
+      zone.classList.add('flash');
+      setTimeout(function(){ zone.classList.remove('flash'); },500);
+    }
+    e.preventDefault();
+  });
+}
+nfWirePasteZone('nfPasteZone','bug');
+nfWirePasteZone('nfFeatPasteZone','feat');
+
+/* ═══ Image annotation editor ═══ */
+var NF_IE_COLORS = ['#EF4444','#F59E0B','#22C55E','#3B82F6','#1E1B4B'];
+var _nfIe = { uid:null, tool:'pen', color:NF_IE_COLORS[0], drawing:false, startX:0, startY:0, history:[], baseImage:null };
+(function(){
+  var wrap=document.getElementById('nfIeColors');
+  NF_IE_COLORS.forEach(function(c,i){
+    var b=document.createElement('button');
+    b.className='nf-imgedit-color'+(i===0?' sel':'');
+    b.style.background=c;
+    b.onclick=function(){ nfImgEditColor(b,c); };
+    wrap.appendChild(b);
+  });
+})();
+function nfImgEditFind(uid){
+  return _nfImgFiles.bug.find(function(f){return f.uid===uid;}) || _nfImgFiles.feat.find(function(f){return f.uid===uid;});
+}
+function nfImgEditOpen(uid){
+  var item=nfImgEditFind(uid);
+  if(!item) return;
+  _nfIe.uid=uid; _nfIe.tool='pen'; _nfIe.history=[];
+  document.querySelectorAll('.nf-imgedit-tool').forEach(function(b){b.classList.remove('sel');});
+  document.getElementById('nfIeToolPen').classList.add('sel');
+  var canvas=document.getElementById('nfIeCanvas');
+  var ctx=canvas.getContext('2d');
+  var img=new Image();
+  img.onload=function(){
+    canvas.width=img.naturalWidth; canvas.height=img.naturalHeight;
+    ctx.drawImage(img,0,0);
+    _nfIe.baseImage=img;
+    nfImgEditPush();
+    document.getElementById('nfImgEditOverlay').classList.add('open');
+  };
+  img.src=item.dataURL;
+}
+function nfImgEditTool(tool){
+  _nfIe.tool=tool;
+  document.querySelectorAll('.nf-imgedit-tool').forEach(function(b){b.classList.remove('sel');});
+  ({pen:'nfIeToolPen',rect:'nfIeToolRect',arrow:'nfIeToolArrow'})[tool] && document.getElementById(({pen:'nfIeToolPen',rect:'nfIeToolRect',arrow:'nfIeToolArrow'})[tool]).classList.add('sel');
+}
+function nfImgEditColor(btn,c){
+  _nfIe.color=c;
+  document.querySelectorAll('.nf-imgedit-color').forEach(function(b){b.classList.remove('sel');});
+  btn.classList.add('sel');
+}
+function nfImgEditPos(e){
+  var canvas=document.getElementById('nfIeCanvas');
+  var rect=canvas.getBoundingClientRect();
+  var cx=(e.touches?e.touches[0].clientX:e.clientX)-rect.left;
+  var cy=(e.touches?e.touches[0].clientY:e.clientY)-rect.top;
+  return { x: cx*(canvas.width/rect.width), y: cy*(canvas.height/rect.height) };
+}
+function nfImgEditPush(){
+  var canvas=document.getElementById('nfIeCanvas');
+  var ctx=canvas.getContext('2d');
+  _nfIe.history.push(ctx.getImageData(0,0,canvas.width,canvas.height));
+  if(_nfIe.history.length>20) _nfIe.history.shift();
+}
+function nfImgEditUndo(){
+  if(_nfIe.history.length<2) return;
+  _nfIe.history.pop();
+  var canvas=document.getElementById('nfIeCanvas');
+  var ctx=canvas.getContext('2d');
+  ctx.putImageData(_nfIe.history[_nfIe.history.length-1],0,0);
+}
+function nfImgEditReset(){
+  var canvas=document.getElementById('nfIeCanvas');
+  var ctx=canvas.getContext('2d');
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.drawImage(_nfIe.baseImage,0,0);
+  nfImgEditPush();
+}
+function nfImgEditArrow(ctx,x1,y1,x2,y2){
+  var head=Math.max(10, (ctx.lineWidth||3)*4);
+  var angle=Math.atan2(y2-y1,x2-x1);
+  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(x2,y2);
+  ctx.lineTo(x2-head*Math.cos(angle-Math.PI/6), y2-head*Math.sin(angle-Math.PI/6));
+  ctx.lineTo(x2-head*Math.cos(angle+Math.PI/6), y2-head*Math.sin(angle+Math.PI/6));
+  ctx.closePath(); ctx.fill();
+}
+(function(){
+  var canvas=document.getElementById('nfIeCanvas');
+  var snapshot=null;
+  function start(e){
+    e.preventDefault();
+    _nfIe.drawing=true;
+    var p=nfImgEditPos(e);
+    _nfIe.startX=p.x; _nfIe.startY=p.y;
+    var ctx=canvas.getContext('2d');
+    snapshot=ctx.getImageData(0,0,canvas.width,canvas.height);
+    if(_nfIe.tool==='pen'){
+      ctx.strokeStyle=_nfIe.color; ctx.lineWidth=4; ctx.lineCap='round'; ctx.lineJoin='round';
+      ctx.beginPath(); ctx.moveTo(p.x,p.y);
+    }
   }
+  function move(e){
+    if(!_nfIe.drawing) return;
+    e.preventDefault();
+    var p=nfImgEditPos(e);
+    var ctx=canvas.getContext('2d');
+    if(_nfIe.tool==='pen'){
+      ctx.lineTo(p.x,p.y); ctx.stroke();
+    } else {
+      ctx.putImageData(snapshot,0,0);
+      ctx.strokeStyle=_nfIe.color; ctx.fillStyle=_nfIe.color; ctx.lineWidth=4; ctx.lineCap='round'; ctx.lineJoin='round';
+      if(_nfIe.tool==='rect'){
+        ctx.strokeRect(_nfIe.startX,_nfIe.startY,p.x-_nfIe.startX,p.y-_nfIe.startY);
+      } else if(_nfIe.tool==='arrow'){
+        nfImgEditArrow(ctx,_nfIe.startX,_nfIe.startY,p.x,p.y);
+      }
+    }
+  }
+  function end(e){
+    if(!_nfIe.drawing) return;
+    _nfIe.drawing=false;
+    nfImgEditPush();
+  }
+  canvas.addEventListener('mousedown',start);
+  canvas.addEventListener('mousemove',move);
+  canvas.addEventListener('mouseup',end);
+  canvas.addEventListener('mouseleave',end);
+  canvas.addEventListener('touchstart',start);
+  canvas.addEventListener('touchmove',move);
+  canvas.addEventListener('touchend',end);
+})();
+function nfImgEditSave(){
+  var canvas=document.getElementById('nfIeCanvas');
+  var dataURL=canvas.toDataURL('image/png');
+  var item=nfImgEditFind(_nfIe.uid);
+  if(item){
+    item.dataURL=dataURL;
+    var thumb=document.getElementById(item.uid);
+    if(thumb){ var img=thumb.querySelector('img'); if(img) img.src=dataURL; }
+  }
+  nfImgEditClose();
+}
+function nfImgEditClose(){
+  document.getElementById('nfImgEditOverlay').classList.remove('open');
+  _nfIe.uid=null; _nfIe.history=[];
 }
 </script>
 <script>
