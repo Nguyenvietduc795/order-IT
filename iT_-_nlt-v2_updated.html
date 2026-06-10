@@ -1210,7 +1210,6 @@ body::before{
         <span class="pj-stage active">Kiểm tra &amp; hoàn thiện</span>
         <span class="pj-stage">Ra mắt</span>
       </div>
-      <div class="pj-checklist-alert" onclick="openStaticProjCL(2)">📋 Checklist nghiệm thu đang chờ — bấm để kiểm tra!</div>
       <div class="proj-dri"><div class="proj-dri-ava" style="background:#5B4FE8" title="Văn Đức Tân — đang phụ trách">VĐ</div></div>
       <button class="pj-btn" onclick="openStaticProj(2)">🔎 Xem tiến độ chi tiết →</button>
     </div>
@@ -5909,7 +5908,7 @@ function qkSubmit(){
     <!-- BƯỚC 1: 3 LOẠI -->
     <div class="nf-view on" id="nf-1">
       <div class="nf-h">Bạn cần IT giúp gì?</div>
-      <p class="nf-sub">Chọn loại — hệ thống báo ngay thời gian IT phản hồi.</p>
+     
       <div class="nf-typegrid">
         <button class="nf-type" onclick="nfPickType('bug','Báo lỗi')">
           <div class="t"><span class="dot" style="background:#EF4444"></span>Báo lỗi</div>
@@ -6089,7 +6088,7 @@ function qkSubmit(){
     <!-- BƯỚC 4: CONFIRM -->
     <div class="nf-view" id="nf-4">
       <div class="nf-h">Đọc lại trước khi gửi</div>
-      <p class="nf-sub">Gửi xong vẫn sửa được, cho đến khi IT nhận order.</p>
+
       <div class="nf-sum">
         <div class="nf-srow"><span class="k">Tên</span><span class="v" id="nfSName"></span></div>
         <div class="nf-srow"><span class="k">Loại</span><span class="v" id="nfSType"></span></div>
@@ -6205,7 +6204,6 @@ function cpOpen(orderId){
       +'</div>';
   }
   cpLoadMsgs(o);
-  cpSwitchTab('chat');
   document.getElementById('chatPanel').classList.add('open');
   document.body.style.overflow='hidden';
 }
@@ -6422,12 +6420,6 @@ function cpClose(){
   if(typeof initOrders==='function') initOrders();
   if(typeof updateStats==='function') updateStats();
 }
-function cpSwitchTab(t){
-  ['chat','deliver'].forEach(function(x){
-    document.getElementById('cpTab-'+x).classList.toggle('on',x===t);
-    document.getElementById('cpPane-'+x).classList.toggle('on',x===t);
-  });
-}
 function cpGetOrders(){ try{return JSON.parse(localStorage.getItem('nhile_user_submitted')||'[]');}catch(e){return[];} }
 function cpSaveOrders(q){ try{localStorage.setItem('nhile_user_submitted',JSON.stringify(q));}catch(e){} }
 function cpLoadMsgs(o){
@@ -6451,21 +6443,6 @@ function cpSend(){
   o.messages=msgs; cpSaveOrders(orders); inp.value='';
   cpLoadMsgs(o);
 }
-function cpDeliver(){
-  var link=document.getElementById('cpDelLink').value.trim();
-  var note=document.getElementById('cpDelNote').value.trim();
-  if(!link){ if(typeof showOrderToast==='function') showOrderToast('Cần có link sản phẩm'); return; }
-  var orders=cpGetOrders(); var o=orders.find(function(x){return x.id===cpOid;}); if(!o) return;
-  o.deliverLink=link; o.deliverNote=note; o.status='qa';
-  var msgs=o.messages||[];
-  msgs.push({side:'left',sender:'IT Team',text:'Đã giao sản phẩm. Link: '+link+(note?'\n'+note:''),time:cpNow()});
-  o.messages=msgs; cpSaveOrders(orders);
-  if(typeof initOrders==='function') initOrders();
-  cpSwitchTab('chat'); cpLoadMsgs(o);
-  document.getElementById('cpStatus').textContent='Chờ nghiệm thu';
-  if(typeof showOrderToast==='function') showOrderToast('Đã giao sản phẩm!');
-}
-
 
 </script>
 <script>
@@ -6724,7 +6701,6 @@ function nfOpenChat(){
   <div class="cp-box">
     <div class="cp-hd">
       <button class="cp-close" onclick="cpClose()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-      <div class="cp-bell" title="Thông báo">🔔<span style="font-size:9px;font-weight:700;background:#EF4444;color:#fff;border-radius:99px;padding:1px 4px;vertical-align:top">99+</span></div>
       <div class="cp-title" id="cpTitle">—</div>
       <div class="cp-sender" id="cpSender">—</div>
     </div>
@@ -6740,36 +6716,11 @@ function nfOpenChat(){
       <div class="cp-brief" id="cpBrief"></div>
     </div>
 
-    <div class="cp-tabs">
-      <button class="cp-tab on" id="cpTab-chat" onclick="cpSwitchTab('chat')">
-        <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-        Nhắn tin
-      </button>
-      <button class="cp-tab" id="cpTab-deliver" onclick="cpSwitchTab('deliver')">
-        <svg viewBox="0 0 24 24"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
-        Giao sản phẩm
-      </button>
-    </div>
-
     <div class="cp-pane on" id="cpPane-chat">
       <div class="cp-msgs" id="cpMsgs"></div>
       <div class="cp-chat-in-row">
         <textarea class="cp-chat-in" id="cpChatIn" rows="1" placeholder="Trao đổi với IT..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();cpSend();}"></textarea>
         <button class="cp-send" onclick="cpSend()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:14px;height:14px;stroke-linecap:round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
-      </div>
-    </div>
-
-    <div class="cp-pane" id="cpPane-deliver">
-      <div class="cp-deliver">
-        <div>
-          <div class="cp-del-lbl">Link sản phẩm (Drive, Canva...)</div>
-          <input class="cp-del-input" id="cpDelLink" placeholder="https://drive.google.com/...">
-        </div>
-        <div>
-          <div class="cp-del-lbl">Ghi chú bàn giao</div>
-          <textarea class="cp-del-input" id="cpDelNote" rows="3" placeholder="Mô tả phiên bản, những thứ đã làm..." style="resize:vertical"></textarea>
-        </div>
-        <button class="cp-del-btn" onclick="cpDeliver()">Giao sản phẩm cho orderer</button>
       </div>
     </div>
   </div>
