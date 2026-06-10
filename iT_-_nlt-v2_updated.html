@@ -2123,6 +2123,21 @@ function pfHandleDrop(e) {
   document.getElementById('pf-dropzone').style.borderColor='#e0d8c8';
   pfHandleFiles(e.dataTransfer.files);
 }
+function nfHandleImages(files) {
+  const list = document.getElementById('nfFeatImgList');
+  [...files].forEach(function(f) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const wrap = document.createElement('div');
+      wrap.style.cssText = 'position:relative;display:inline-block';
+      wrap.innerHTML = '<img src="'+e.target.result+'" title="'+f.name+'" style="width:80px;height:80px;object-fit:cover;border-radius:8px;border:1.5px solid #e0e0e0;display:block">'
+        +'<span onclick="this.parentElement.remove()" style="position:absolute;top:-6px;right:-6px;width:18px;height:18px;background:#ff4d4d;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;font-weight:700;line-height:1">×</span>';
+      list.appendChild(wrap);
+    };
+    reader.readAsDataURL(f);
+  });
+  document.getElementById('nfFeatImgs').value = '';
+}
 
 function foCheck() {
   const name = document.getElementById('pf-feat-name')?.value.trim();
@@ -6159,6 +6174,15 @@ function qkSubmit(){
       <!-- === TÍNH NĂNG MỚI === -->
       <div id="nfFieldsFeat" style="display:none">
         <div class="nf-field">
+          <div class="nf-label"><span>Link tham khảo / mockup</span></div>
+          <div style="display:flex;gap:8px;align-items:stretch">
+            <input class="nf-input" id="nfFeatRef" placeholder="Link app tham khảo, Drive mockup, screenshot..." style="flex:1">
+            <button type="button" onclick="document.getElementById('nfFeatImgs').click()" style="white-space:nowrap;padding:0 14px;background:#f0f4ff;color:#3b5bdb;border:1.5px solid #c5d0f5;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;transition:background .15s" onmouseover="this.style.background='#e0e8ff'" onmouseout="this.style.background='#f0f4ff'">+ Thêm ảnh</button>
+            <input type="file" id="nfFeatImgs" multiple accept="image/*" style="display:none" onchange="nfHandleImages(this.files)">
+          </div>
+          <div id="nfFeatImgList" style="margin-top:8px;display:flex;flex-wrap:wrap;gap:8px"></div>
+        </div>
+        <div class="nf-field">
           <div class="nf-label"><span>Vấn đề bạn đang gặp là gì? <span class="req">*</span></span><span class="cnt" id="nfFeatProbCnt">0/600</span></div>
           <textarea class="nf-ta" id="nfFeatProb" maxlength="600" placeholder="Hiện tại làm bằng cách nào? Vì sao bất tiện?" oninput="document.getElementById('nfFeatProbCnt').textContent=this.value.length+'/600'"></textarea>
         </div>
@@ -6173,10 +6197,6 @@ function qkSubmit(){
             <option>Cả phòng ban</option>
             <option>Toàn bộ hệ thống / khách hàng ngoài</option>
           </select>
-        </div>
-        <div class="nf-field">
-          <div class="nf-label"><span>Link tham khảo / mockup</span></div>
-          <input class="nf-input" id="nfFeatRef" placeholder="Link app tham khảo, Drive mockup, screenshot...">
         </div>
       </div>
 
@@ -6209,14 +6229,24 @@ function qkSubmit(){
 
       <!-- Hẹn meeting — Tính năng mới -->
       <div class="nf-field" id="nfMeetSection" style="margin-top:4px;display:none">
-        <div class="nf-label"><span>Hẹn meeting trao đổi <span class="cnt">(không bắt buộc)</span></span></div>
-        <div class="nf-hint" style="margin-bottom:10px">Tính năng mới thường cần trao đổi thêm trước khi làm — chọn thời gian bạn rảnh, IT sẽ xác nhận lịch họp ngắn.</div>
-        <div class="nf-2col" id="nfMeetTimeRow">
-          <input type="date" class="nf-input" id="nfMeetDate">
-          <input type="time" class="nf-input" id="nfMeetTime">
+        <div class="nf-label"><span>Hẹn gặp IT để trao đổi kỹ hơn <span class="req">*</span></span></div>
+        <div style="background:#f0f4ff;border:1.5px solid #c5d0f5;border-radius:10px;padding:12px 14px;margin-bottom:12px;font-size:13px;color:#3b4a6b;line-height:1.6">
+          Tính năng mới thường cần một buổi trao đổi ngắn để IT hiểu đúng yêu cầu trước khi bắt tay làm.<br>
+          <span style="color:#3b5bdb;font-weight:600">Chọn khung giờ bạn rảnh</span> — IT sẽ xác nhận và tạo lịch.
         </div>
-        <label style="display:flex;align-items:center;gap:8px;margin-top:10px;font-size:13px;color:var(--text,#1E1B4B);cursor:pointer">
-          <input type="checkbox" id="nfMeetSkip" onchange="document.getElementById('nfMeetTimeRow').style.display=this.checked?'none':'grid'"> Bỏ qua, không cần meeting — mô tả ở trên là đủ
+        <div class="nf-2col" id="nfMeetTimeRow">
+          <div style="display:flex;flex-direction:column;gap:4px">
+            <label style="font-size:11px;font-weight:600;color:#5d6d7e;text-transform:uppercase;letter-spacing:.5px">Ngày</label>
+            <input type="date" class="nf-input" id="nfMeetDate">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:4px">
+            <label style="font-size:11px;font-weight:600;color:#5d6d7e;text-transform:uppercase;letter-spacing:.5px">Giờ</label>
+            <input type="time" class="nf-input" id="nfMeetTime">
+          </div>
+        </div>
+        <label style="display:flex;align-items:center;gap:8px;margin-top:12px;font-size:13px;color:#5d6d7e;cursor:pointer;padding:10px 12px;border:1px solid #e5e7eb;border-radius:8px;background:#fafafa">
+          <input type="checkbox" id="nfMeetSkip" onchange="document.getElementById('nfMeetTimeRow').style.display=this.checked?'none':'grid';this.closest('label').style.background=this.checked?'#f0fff4':'#fafafa';this.closest('label').style.borderColor=this.checked?'#86efac':'#e5e7eb'">
+          <span>Mô tả ở trên đã đủ, không cần gặp trực tiếp</span>
         </label>
       </div>
 
@@ -6531,6 +6561,7 @@ function nfAddCrit(text){
 function nfOpen(){
   nfData={type:'',typeName:'',name:'',system:'',deadline:'',urgent:false,impact:'minor',brief:'',ref:'',criteria:[]};
   ['nfName','nfBugAction','nfBugExpect','nfBugActual','nfBugRef','nfFeatProb','nfFeatDesc','nfFeatRef','nfOtherDesc','nfOtherRef','nfDeadline','nfMeetDate','nfMeetTime'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
+  document.getElementById('nfFeatImgList').innerHTML = '';
   document.getElementById('nfMeetSkip').checked=false;
   document.getElementById('nfMeetTimeRow').style.display='grid';
   ['nfCritSection','nfDoneSection','nfMeetSection'].forEach(function(id){ document.getElementById(id).style.display='none'; });
